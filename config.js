@@ -1,6 +1,6 @@
 module.exports = {
     apps: {
-        'lmail': '/home/sumin/lmail/',
+        'test': '../tests/'
     },
     port:8080
-}
+};
