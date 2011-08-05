@@ -116,7 +116,7 @@ vows.describe('Test doc').addBatch({
         },
 
         'has error': function (res) {
-            assert.equal (res.error.code, 599);
+            assert.equal (res.error.code, null);
             assert.equal (res.error.message, 'Timeout');
         }
     }
@@ -142,8 +142,30 @@ vows.describe('Test doc').addBatch({
         },
 
         'has error': function (res) {
-            assert.equal (res.error.code, 599);
+            assert.equal (res.error.code, null);
             assert.equal (res.error.message, 'Timeout');
+        }
+    }
+}).addBatch({
+    'callback': {
+        topic: function(){
+            var promise = new (events.EventEmitter);
+            var server = http.createServer(function(request, response) {
+                response.writeHead(200);
+                response.end();
+                server.close();
+            });
+            server.listen(port);
+            
+            var hand = handler();
+            hand.http('http://' + host, function(response) {return response.statusCode;})
+                .then(function(res){promise.emit('success', res);}
+            );
+            return promise;
+        },
+
+        'has error': function (res) {
+            assert.equal (res, 200);
         }
     }
 }).export(module);
