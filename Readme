@@ -1,0 +1,17 @@
+IMPORTANT deep alpha, everything can be changed.
+
+To use FrontikJS you need NodeJS 0.4.0 or above.
+http://nodejs.org/
+
+Install NodeJS, then checkout FrontikJS.
+Copy config.js.ex to config.js and change port if you need.
+> node lib/app.js
+> curl "localhost:8080"
+8080 if you don't change port in config file.
+You should see "Hello world" html page.
+
+If you want to run tests you need npm
+http://npmjs.org/
+
+And vows
+http://vowsjs.org/
