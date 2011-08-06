@@ -168,4 +168,21 @@ vows.describe('Test doc').addBatch({
             assert.equal (res, 200);
         }
     }
+}).addBatch({
+    'finish': {
+        topic: function(){
+            var promise = new (events.EventEmitter);            
+            var hand = handler();
+            hand.put('json1', {"foo": "bar"})
+                .put('json2', {"foo": "bar"})
+                .then(function(res){promise.emit('success', res);})
+                .finish();
+            return promise;
+        },
+
+        'has error': function (res) {
+            assert.equal (res.json1.foo, "bar");
+            assert.equal (res.json2.foo, "bar");
+        }
+    }
 }).export(module);
