@@ -1,6 +1,6 @@
 module.exports = {
-    apps: {
-        'test': '../tests/'
+    apps: function(request){
+        return '../tests/app';
     },
-    port: process.env.C9_PORT || 8080
+    port: 8080
 };
