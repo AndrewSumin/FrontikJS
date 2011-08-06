@@ -169,6 +169,34 @@ vows.describe('Test doc').addBatch({
         }
     }
 }).addBatch({
+    'async callback': {
+        topic: function(){
+            var promise = new (events.EventEmitter);
+            var server = http.createServer(function(request, response) {
+                response.writeHead(200);
+                response.end();
+                server.close();
+            });
+            server.listen(port);
+            
+            var hand = handler();
+            var callback = defer();
+            hand.http('http://' + host, function(response){
+                    setTimeout(function(){callback.resolve(response.statusCode);}, 100);
+                    return callback;
+                })
+                .then(function(res){promise.emit('success', res);}
+            );
+            
+            
+            return promise;
+        },
+
+        'has error': function (res) {
+            assert.equal (res, 200);
+        }
+    }
+}).addBatch({
     'finish': {
         topic: function(){
             var promise = new (events.EventEmitter);            
