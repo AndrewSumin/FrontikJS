@@ -7,7 +7,34 @@ var vows = require('vows'),
     port = process.env.C9_PORT || '8081',
     host = process.env.C9_PORT ? 'frontikjs.andrewsumin.cloud9ide.com' : 'localhost:' + port;
 
-vows.describe('Test doc').addBatch({
+vows.describe('Test handler').addBatch({
+    'JSON from file': {
+        topic: function(){
+            var promise = new (events.EventEmitter);
+            var hand = handler();
+            hand.file('tests/json.js')
+                .then(function(res){promise.emit('success', res);});
+            return promise;
+        },
+
+        'has JSON': function (res) {
+            assert.equal (res.foo, 'bar');
+        }
+    },
+    'nofile file': {
+        topic: function(){
+            var promise = new (events.EventEmitter);
+            var hand = handler();
+            hand.file('tests/nofile.js')
+                .then(function(res){promise.emit('success', res);});
+            return promise;
+        },
+
+        'has JSON': function (res) {
+            assert.equal (res.code, 'ENOENT');
+        }
+    }
+}).addBatch({
     'GET JSON': {
         topic: function(){
             var promise = new (events.EventEmitter);
