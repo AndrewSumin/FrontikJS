@@ -4,11 +4,7 @@ module.exports = {
     apply: function(handler){
         var promise = defer();
         
-        handler.put('foo', promise);
-        
-        setTimeout(function(){
-            promise.resolve({"message": "Hello world"});
-        }, 100);
+        handler.put('foo', handler.file(handler.config.data_dir + '/json.js'));
         
         handler.then(function(doc){
             handler.response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
