@@ -1,8 +1,5 @@
-var defer = require('../lib/defer');
-
 module.exports = {
     apply: function(handler){
-        var promise = defer();
         
         handler.put('foo', handler.file(handler.config.data_dir + '/json.js'));
         
