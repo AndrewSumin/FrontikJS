@@ -15,3 +15,23 @@ http://npmjs.org/
 
 And vows
 http://vowsjs.org/
+
+
+
+-----------------------------------------------
+
+See test app to create your own application.
+If you have several apps, write config.apps function.
+
+Application must have apply method.
+This method reseive handler object and must return
+handler object
+
+
+handler.http(url, [options], [callback]);
+
+handler.file(path, [callback]);
+
+handler.put(name, promise); // promise – handler.http || handler.file
+
+handler.ready(callback); // callback reseive final document

@@ -4,7 +4,5 @@ module.exports = {
         return '../tests/app';
     },
 
-    data_dir: __dirname + '/tests',
-
     request_id_header: "X-Request-ID"
 };

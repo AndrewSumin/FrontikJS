@@ -1,7 +1,7 @@
 module.exports = {
     apply: function(handler){
         
-        handler.put('foo', handler.file(handler.config.data_dir + '/json.js'));
+        handler.put('foo', handler.file(__dirname + '/json.js'));
         
         handler.then(function(doc){
             handler.response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
