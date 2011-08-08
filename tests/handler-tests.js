@@ -11,9 +11,10 @@ vows.describe('Test handler').addBatch({
     'JSON from file': {
         topic: function(){
             var promise = new (events.EventEmitter);
-            var hand = handler();
-            hand.file('tests/json.js')
-                .then(function(res){promise.emit('success', res);});
+            handler().then(function(handler){
+                handler.file('tests/json.js')
+                       .then(function(res){promise.emit('success', res);});
+            });
             return promise;
         },
 
@@ -24,9 +25,10 @@ vows.describe('Test handler').addBatch({
     'nofile file': {
         topic: function(){
             var promise = new (events.EventEmitter);
-            var hand = handler();
-            hand.file('tests/nofile.js')
-                .then(function(res){promise.emit('success', res);});
+            handler().then(function(handler){
+                handler.file('tests/nofile.js')
+                       .then(function(res){promise.emit('success', res);});
+            });
             return promise;
         },
 
@@ -48,9 +50,10 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            var hand = handler();
-            hand.http('http://' + host)
-                .then(function(res){promise.emit('success', res);});
+            handler().then(function(handler){
+                handler.http('http://' + host)
+                       .then(function(res){promise.emit('success', res);});
+            });
             return promise;
         },
 
@@ -72,14 +75,44 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            var hand = handler();
-            hand.http('http://' + host, {method:'POST'})
-                .then(function(res){promise.emit('success', res);});
+            handler().then(function(handler){
+                handler.http('http://' + host, {method:'POST'})
+                       .then(function(res){promise.emit('success', res);});
+            });
             return promise;
         },
 
         'has JSON': function (res) {
             assert.equal (res.result, 'success');
+        }
+    }
+}).addBatch({
+    'POST JSON with body': {
+        topic: function(){
+            var promise = new (events.EventEmitter);
+            var server = http.createServer(function(request, response) {
+                response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+                var body = '';
+                request.on('data', function (data) {
+                    body += data;
+                });
+                request.on('end', function () {
+                    response.write('' + body);
+                    response.end('\n');
+                    server.close();
+                });
+            });
+            server.listen(port);
+            
+            handler().then(function(handler){
+                handler.http('http://' + host, {method:'POST', body:'{"foo": "bar"}'})
+                       .then(function(res){promise.emit('success', res);});
+            });
+            return promise;
+        },
+
+        'has JSON': function (res) {
+            assert.equal (res.foo, 'bar');
         }
     }
 }).addBatch({
@@ -94,9 +127,10 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            var hand = handler();
-            hand.http('http://' + host, {method:'POST'})
-                .then(function(res){promise.emit('success', res);});
+            handler().then(function(handler){
+                handler.http('http://' + host, {method:'POST'})
+                       .then(function(res){promise.emit('success', res);});
+            });
             return promise;
         },
 
@@ -110,15 +144,16 @@ vows.describe('Test handler').addBatch({
             var promise = new (events.EventEmitter);
             var server = http.createServer(function(request, response) {
                 response.writeHead(500);
-                response.write('Internal error')
+                response.write('Internal error');
                 response.end();
                 server.close();
             });
             server.listen(port);
             
-            var hand = handler();
-            hand.http('http://' + host)
-                .then(function(res){promise.emit('success', res);});
+            handler().then(function(handler){
+                handler.http('http://' + host)
+                       .then(function(res){promise.emit('success', res);});
+            });
             return promise;
         },
 
@@ -136,9 +171,10 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            var hand = handler();
-            hand.http('http://' + host)
-                .then(function(res){server.close(); promise.emit('success', res);});
+            handler().then(function(handler){
+                handler.http('http://' + host)
+                       .then(function(res){server.close(); promise.emit('success', res);});
+            });
             return promise;
         },
 
@@ -156,14 +192,15 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            var hand = handler(), timeout;
-            hand.http('http://' + host, {timeout: 500})
-                .then(function(res){
-                    clearTimeout(timeout);
-                    server.close();
-                    promise.emit('success', res);
-                }
-            );
+            var timeout;
+            handler().then(function(handler){
+                handler.http('http://' + host, {timeout: 500})
+                       .then(function(res){
+                           clearTimeout(timeout);
+                           server.close();
+                           promise.emit('success', res);
+                       });
+            });
             timeout = setTimeout(function(){promise.emit('error', 'Timeout broken');}, 500);
             return promise;
         },
@@ -184,10 +221,11 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            var hand = handler();
-            hand.http('http://' + host, function(response) {return response.statusCode;})
-                .then(function(res){promise.emit('success', res);}
-            );
+            handler().then(function(handler){
+                handler.http('http://' + host, function(response) {return response.statusCode;})
+                       .then(function(res){promise.emit('success', res);}
+                );
+            });
             return promise;
         },
 
@@ -206,15 +244,15 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            var hand = handler();
             var callback = defer();
-            hand.http('http://' + host, function(response){
-                    setTimeout(function(){callback.resolve(response.statusCode);}, 100);
-                    return callback;
-                })
-                .then(function(res){promise.emit('success', res);}
-            );
-            
+            handler().then(function(handler){
+                handler.http('http://' + host, function(response){
+                            setTimeout(function(){callback.resolve(response.statusCode);}, 100);
+                            return callback;
+                        })
+                       .then(function(res){promise.emit('success', res);}
+                );
+            });
             
             return promise;
         },
@@ -227,11 +265,12 @@ vows.describe('Test handler').addBatch({
     'finish': {
         topic: function(){
             var promise = new (events.EventEmitter);            
-            var hand = handler();
-            hand.put('json1', {"foo": "bar"})
-                .put('json2', {"foo": "bar"})
-                .then(function(res){promise.emit('success', res);})
-                .finish();
+            handler().then(function(handler){
+                handler.put('json1', {"foo": "bar"})
+                       .put('json2', {"foo": "bar"})
+                       .then(function(res){promise.emit('success', res);})
+                       .finish();
+            });
             return promise;
         },
 
