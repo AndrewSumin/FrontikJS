@@ -35,5 +35,3 @@ handler.http(url, [options], [callback]);
 handler.file(path, [callback]);
 
 handler.put(name, promise); // promise – handler.http || handler.file
-
-handler.ready(callback); // callback reseive final document
