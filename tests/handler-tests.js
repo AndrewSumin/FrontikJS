@@ -11,10 +11,10 @@ vows.describe('Test handler').addBatch({
     'JSON from file': {
         topic: function(){
             var promise = new (events.EventEmitter);
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.file('tests/json.js')
                        .then(function(res){promise.emit('success', res);});
-            });
+                });
             return promise;
         },
 
@@ -25,7 +25,7 @@ vows.describe('Test handler').addBatch({
     'nofile file': {
         topic: function(){
             var promise = new (events.EventEmitter);
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.file('tests/nofile.js')
                        .then(function(res){promise.emit('success', res);});
             });
@@ -50,7 +50,7 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.http('http://' + host)
                        .then(function(res){promise.emit('success', res);});
             });
@@ -75,7 +75,7 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.http('http://' + host, {method:'POST'})
                        .then(function(res){promise.emit('success', res);});
             });
@@ -104,7 +104,7 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.http('http://' + host, {method:'POST', body:'{"foo": "bar"}'})
                        .then(function(res){promise.emit('success', res);});
             });
@@ -127,7 +127,7 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.http('http://' + host, {method:'POST'})
                        .then(function(res){promise.emit('success', res);});
             });
@@ -150,7 +150,7 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.http('http://' + host)
                        .then(function(res){promise.emit('success', res);});
             });
@@ -171,7 +171,7 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.http('http://' + host)
                        .then(function(res){server.close(); promise.emit('success', res);});
             });
@@ -193,7 +193,7 @@ vows.describe('Test handler').addBatch({
             server.listen(port);
             
             var timeout;
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.http('http://' + host, {timeout: 500})
                        .then(function(res){
                            clearTimeout(timeout);
@@ -221,7 +221,7 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port);
             
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.http('http://' + host, function(response) {return response.statusCode;})
                        .then(function(res){promise.emit('success', res);}
                 );
@@ -245,7 +245,7 @@ vows.describe('Test handler').addBatch({
             server.listen(port);
             
             var callback = defer();
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.http('http://' + host, function(response){
                             setTimeout(function(){callback.resolve(response.statusCode);}, 100);
                             return callback;
@@ -262,14 +262,14 @@ vows.describe('Test handler').addBatch({
         }
     }
 }).addBatch({
-    'finish': {
+    'then': {
         topic: function(){
             var promise = new (events.EventEmitter);            
-            handler().then(function(handler){
+            handler().wait(function(handler){
                 handler.put('json1', {"foo": "bar"})
-                       .put('json2', {"foo": "bar"})
-                       .then(function(res){promise.emit('success', res);})
-                       .finish();
+                       .put('json2', {"foo": "bar"});
+            }).then(function(res){
+                promise.emit('success', res);
             });
             return promise;
         },
