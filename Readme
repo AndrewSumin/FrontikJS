@@ -5,7 +5,7 @@ http://nodejs.org/
 
 Install NodeJS, then checkout FrontikJS.
 Copy config.js.ex to config.js and change port if you need.
-> node lib/app.js
+> node lib/frontik.js
 > curl "localhost:8080"
 8080 if you don't change port in config file.
 You should see "Hello world" html page.
