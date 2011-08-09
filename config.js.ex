@@ -5,5 +5,7 @@ module.exports = {
         promise.resolve('../tests/app');
     },
 
+    // log_level: "DEBUG",
+
     request_id_header: "X-Request-ID"
 };
