@@ -1,7 +1,8 @@
 module.exports = {
     port: 8080,
-    apps: function(request){
-        return '../tests/app';
+    apps: function(promise){
+        // you can use promise.request if you need;
+        promise.resolve('../tests/app');
     },
 
     request_id_header: "X-Request-ID"
