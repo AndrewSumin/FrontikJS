@@ -5,7 +5,7 @@ var vows = require('vows'),
     handler = require('../lib/handler'),
     defer = require('../lib/defer'),
     port = process.env.C9_PORT || '8081',
-    host = process.env.C9_PORT ? 'frontikjs.andrewsumin.cloud9ide.com' : 'localhost:' + port;
+    host = process.env.C9_PORT ? 'frontikjs.andrewsumin.cloud9ide.com' : '127.0.0.1:' + port;
 
 vows.describe('Test handler').addBatch({
     'JSON from file': {
@@ -48,11 +48,12 @@ vows.describe('Test handler').addBatch({
                 response.end('\n');
                 server.close();
             });
-            server.listen(port);
-            
-            handler().wait(function(handler){
-                handler.http('http://' + host)
-                       .then(function(res){promise.emit('success', res);});
+            server.listen(port, function(){
+                handler().wait(function(handler){
+                    console.log('http://' + host)
+                    handler.http('http://' + host)
+                           .then(function(res){promise.emit('success', res);});
+                });
             });
             return promise;
         },
@@ -73,11 +74,11 @@ vows.describe('Test handler').addBatch({
                 response.end('\n');
                 server.close();
             });
-            server.listen(port);
-            
-            handler().wait(function(handler){
-                handler.http('http://' + host, {method:'POST'})
-                       .then(function(res){promise.emit('success', res);});
+            server.listen(port, function(){
+                handler().wait(function(handler){
+                    handler.http('http://' + host, {method:'POST'})
+                           .then(function(res){promise.emit('success', res);});
+                });
             });
             return promise;
         },
@@ -102,11 +103,11 @@ vows.describe('Test handler').addBatch({
                     server.close();
                 });
             });
-            server.listen(port);
-            
-            handler().wait(function(handler){
-                handler.http('http://' + host, {method:'POST', body:'{"foo": "bar"}'})
-                       .then(function(res){promise.emit('success', res);});
+            server.listen(port, function(){
+                handler().wait(function(handler){
+                    handler.http('http://' + host, {method:'POST', body:'{"foo": "bar"}'})
+                           .then(function(res){promise.emit('success', res);});
+                });
             });
             return promise;
         },
@@ -125,11 +126,11 @@ vows.describe('Test handler').addBatch({
                 response.end();
                 server.close();
             });
-            server.listen(port);
-            
-            handler().wait(function(handler){
-                handler.http('http://' + host, {method:'POST'})
-                       .then(function(res){promise.emit('success', res);});
+            server.listen(port, function(){
+                handler().wait(function(handler){
+                    handler.http('http://' + host, {method:'POST'})
+                           .then(function(res){promise.emit('success', res);});
+                });
             });
             return promise;
         },
@@ -148,11 +149,11 @@ vows.describe('Test handler').addBatch({
                 response.end();
                 server.close();
             });
-            server.listen(port);
-            
-            handler().wait(function(handler){
-                handler.http('http://' + host)
-                       .then(function(res){promise.emit('success', res);});
+            server.listen(port, function(){
+                handler().wait(function(handler){
+                    handler.http('http://' + host)
+                           .then(function(res){promise.emit('success', res);});
+                });
             });
             return promise;
         },
@@ -169,11 +170,11 @@ vows.describe('Test handler').addBatch({
             var server = http.createServer(function(request, response) {
                 response.writeHead(200);
             });
-            server.listen(port);
-            
-            handler().wait(function(handler){
-                handler.http('http://' + host)
-                       .then(function(res){server.close(); promise.emit('success', res);});
+            server.listen(port, function(){
+                handler().wait(function(handler){
+                    handler.http('http://' + host)
+                           .then(function(res){server.close(); promise.emit('success', res);});
+                });
             });
             return promise;
         },
@@ -190,18 +191,18 @@ vows.describe('Test handler').addBatch({
             var server = http.createServer(function(request, response) {
                 response.writeHead(200);
             });
-            server.listen(port);
-            
-            var timeout;
-            handler().wait(function(handler){
-                handler.http('http://' + host, {timeout: 500})
-                       .then(function(res){
-                           clearTimeout(timeout);
-                           server.close();
-                           promise.emit('success', res);
-                       });
+            server.listen(port, function(){
+                var timeout;
+                handler().wait(function(handler){
+                    handler.http('http://' + host, {timeout: 500})
+                           .then(function(res){
+                               clearTimeout(timeout);
+                               server.close();
+                               promise.emit('success', res);
+                           });
+                });
+                timeout = setTimeout(function(){promise.emit('error', 'Timeout broken');}, 500);
             });
-            timeout = setTimeout(function(){promise.emit('error', 'Timeout broken');}, 500);
             return promise;
         },
 
@@ -219,12 +220,12 @@ vows.describe('Test handler').addBatch({
                 response.end();
                 server.close();
             });
-            server.listen(port);
-            
-            handler().wait(function(handler){
-                handler.http('http://' + host, function(response) {return response.statusCode;})
-                       .then(function(res){promise.emit('success', res);}
-                );
+            server.listen(port, function(){
+                handler().wait(function(handler){
+                    handler.http('http://' + host, function(response) {return response.statusCode;})
+                           .then(function(res){promise.emit('success', res);}
+                    );
+                });
             });
             return promise;
         },
@@ -242,18 +243,17 @@ vows.describe('Test handler').addBatch({
                 response.end();
                 server.close();
             });
-            server.listen(port);
-            
-            var callback = defer();
-            handler().wait(function(handler){
-                handler.http('http://' + host, function(response){
-                            setTimeout(function(){callback.resolve(response.statusCode);}, 100);
-                            return callback;
-                        })
-                       .then(function(res){promise.emit('success', res);}
-                );
+            server.listen(port, function(){
+                var callback = defer();
+                handler().wait(function(handler){
+                    handler.http('http://' + host, function(response){
+                                setTimeout(function(){callback.resolve(response.statusCode);}, 100);
+                                return callback;
+                            })
+                           .then(function(res){promise.emit('success', res);}
+                    );
+                });
             });
-            
             return promise;
         },
 
