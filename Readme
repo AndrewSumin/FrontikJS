@@ -23,12 +23,22 @@ http://vowsjs.org/
 See test app to create your own application.
 If you have several apps, write config.apps function.
 
-Application must have "collect" method and this method
-can return defer. This method reseive handler object.
-Application must have "trancform" to transform result
-hash into document (HTML, for example).
-This method reseive handler and hash object object.
+Simple application
 
+module.exports = function (handler, callback){
+    callback({
+        collect: function(callback){
+            // some logic
+            // must call callback() when ready;
+        },
+        transform: function(doc){
+            // make response
+            handler.response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+            handler.response.write('<!DOCTYPE html><head><html><title>FrontikJS</title></head><body>Hello!</body></html>');
+            handler.response.end();
+        }
+    });
+};
 
 handler.http(url, [options], [callback]);
 
