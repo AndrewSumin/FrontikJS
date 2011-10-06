@@ -222,7 +222,7 @@ vows.describe('Test handler').addBatch({
             });
             server.listen(port, function(){
                 handler().ready(function(handler){
-                    handler.http('http://' + host, function(response) {return response.statusCode;})
+                    handler.http('http://' + host, function(result, response) {return response.statusCode;})
                            .then(function(res){promise.emit('success', res);}
                     );
                 });
@@ -246,7 +246,7 @@ vows.describe('Test handler').addBatch({
             server.listen(port, function(){
                 var callback = defer();
                 handler().ready(function(handler){
-                    handler.http('http://' + host, function(response){
+                    handler.http('http://' + host, function(result, response){
                                 setTimeout(function(){callback.resolve(response.statusCode);}, 100);
                                 return callback;
                             })
